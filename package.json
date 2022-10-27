@@ -1,0 +1,26 @@
+{
+  "name": "weapp-upload",
+  "version": "0.0.0",
+  "description": "upload WeChat miniprogram",
+  "main": "dist/weapp-upload.cjs.js",
+  "module": "dist/weapp-upload.esm.js",
+  "scripts": {
+    "watch": "rollup -wc --configPlugin @rollup/plugin-typescript",
+    "build": "rm -rf dist && rollup -c --configPlugin @rollup/plugin-typescript"
+  },
+  "author": "tangbzai",
+  "license": "MIT",
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^23.0.2",
+    "@rollup/plugin-node-resolve": "^15.0.1",
+    "@rollup/plugin-replace": "^5.0.1",
+    "@rollup/plugin-typescript": "^9.0.2",
+    "@types/node": "^18.11.5",
+    "rollup": "^3.2.2",
+    "tslib": "^2.4.0",
+    "typescript": "^4.8.4"
+  },
+  "dependencies": {
+    "commander": "^9.4.1"
+  }
+}
