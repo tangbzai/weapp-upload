@@ -1,6 +1,7 @@
 import { join } from "path";
 import fs from "fs";
 import { createInterface } from "readline";
+import lastCommit from "../utils/lastCommit";
 
 const CONFIG_PATH = "wx-upload-config.json";
 const readline = createInterface({
@@ -40,6 +41,28 @@ function question(query: string): Promise<string> {
   });
 }
 
+/**
+ * 格式化描述
+ */
+function formatDescription(
+  description?: string,
+  baseData?: { version?: string } & LastCommitType
+) {
+  const mapping = {
+    "${TIME}": baseData.buildTime,
+    "${VERSION}": baseData.version,
+    "${AUTHOR}": baseData.author,
+    "${BRANCH}": baseData.branch,
+    "${COMMIT}": baseData.commit,
+    "${DATE}": baseData.date,
+    "${INFO}": baseData.info,
+  };
+  return Object.entries(mapping).reduce(
+    (des, [tmp, val]) => des.replace(tmp, val),
+    description
+  );
+}
+
 export default async function uploadAction() {
   const config = getConfig();
   console.log(config);
@@ -57,6 +80,11 @@ export default async function uploadAction() {
       .filter((t) => t);
     config.appid = appid;
   }
-  console.log(config);
+  const commitInfo = lastCommit();
+  const descText = formatDescription(config.description, {
+    ...commitInfo,
+    version: config.version,
+  });
+  console.log(descText);
   return;
 }
