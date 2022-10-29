@@ -2,7 +2,7 @@
 'use strict';
 
 var commander = require('commander');
-var readline$1 = require('readline');
+var readline = require('readline');
 var path = require('path');
 var fs = require('fs');
 var ci = require('miniprogram-ci');
@@ -108,14 +108,14 @@ function matchStr(baseString, regex) {
 function lastCommit() {
     try {
         var logStr = child_process.execSync("git log -1").toString();
-        var logBranchStr = child_process.execSync("git branch -v").toString();
+        var logBranchStr = child_process.execSync("git branch").toString();
         return {
             commit: matchStr(logStr, new RegExp("(?<=commit).+", "g")),
             merge: matchStr(logStr, new RegExp("(?<=Merge:).+", "g")),
             author: matchStr(logStr, new RegExp("(?<=Author:).+", "g")),
             date: dateFormat(matchStr(logStr, new RegExp("(?<=Date:).+", "g"))),
             info: matchStr(logStr, new RegExp("\n\n.*", "g")),
-            branch: matchStr(logBranchStr, new RegExp("(?<=*s)S+")),
+            branch: matchStr(logBranchStr, new RegExp("(?<=\*\s)\S+")),
             buildTime: dateFormat(new Date())
         };
     }
@@ -201,19 +201,19 @@ function readProjectConfig(projectPath) {
     }
 }
 
-var readline = readline$1.createInterface({
-    input: process$1.stdin,
-    output: process$1.stdout
-});
 var upload = commander.program.command("upload");
 /**
  * Promise 版的 question
  */
 function question(query) {
+    var readline$1 = readline.createInterface({
+        input: process$1.stdin,
+        output: process$1.stdout
+    });
     return new Promise(function (resolve) {
-        readline.question(query, function (answer) {
+        readline$1.question(query, function (answer) {
             resolve(answer);
-            readline.close();
+            readline$1.close();
         });
     });
 }
@@ -224,7 +224,6 @@ upload.action(function () { return __awaiter(void 0, void 0, void 0, function ()
         switch (_b.label) {
             case 0:
                 config = getConfig();
-                console.log(config);
                 if (!!config.version) return [3 /*break*/, 2];
                 return [4 /*yield*/, question("\x1B[96m" + "请输入版本号:")];
             case 1:
@@ -233,7 +232,7 @@ upload.action(function () { return __awaiter(void 0, void 0, void 0, function ()
                 _b.label = 2;
             case 2:
                 if (!!((_a = config.appid) === null || _a === void 0 ? void 0 : _a.length)) return [3 /*break*/, 4];
-                return [4 /*yield*/, question("\x1B[96m" + "请输入appid-多个小程序用','分隔:")];
+                return [4 /*yield*/, question("\x1B[96m" + "请输入appid(多个小程序用','分隔):")];
             case 3:
                 appidStr = _b.sent();
                 appid = appidStr
