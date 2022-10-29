@@ -4,6 +4,10 @@
   "description": "upload WeChat miniprogram",
   "main": "dist/index.cjs.js",
   "module": "dist/index.esm.js",
+  "bin": {
+    "weapp-upload": "./dist/bin.js"
+  },
+  "types": "./index.d.ts",
   "scripts": {
     "watch": "rollup -wc --configPlugin @rollup/plugin-typescript",
     "build": "rm -rf dist && rollup -c --configPlugin @rollup/plugin-typescript"
@@ -21,6 +25,7 @@
     "typescript": "^4.8.4"
   },
   "dependencies": {
-    "commander": "^9.4.1"
+    "commander": "^9.4.1",
+    "miniprogram-ci": "^1.8.35"
   }
 }

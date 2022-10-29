@@ -1,45 +1,9 @@
 import { join } from "path";
 import fs from "fs";
-import { createInterface } from "readline";
+import ci from "miniprogram-ci";
 import lastCommit from "../utils/lastCommit";
-
-const CONFIG_PATH = "wx-upload-config.json";
-const readline = createInterface({
-  input: process.stdin,
-  output: process.stdout,
-});
-
-function getConfig() {
-  if (!fs.existsSync(join(process.cwd(), CONFIG_PATH))) {
-    console.log("wx-upload-config.json不存在");
-    return {};
-  }
-  const configStr = fs.readFileSync(join(process.cwd(), CONFIG_PATH), {
-    encoding: "utf8",
-  });
-  try {
-    const config = JSON.parse(configStr);
-    return {
-      ...config,
-      appid: typeof config.appid === "string" ? [config.appid] : config.appid,
-    };
-  } catch (err) {
-    console.warn("\x1B[33mWarring:", "配置文件解析失败！请检查");
-    return {};
-  }
-}
-
-/**
- * Promise 版的 question
- */
-function question(query: string): Promise<string> {
-  return new Promise((resolve) => {
-    readline.question(query, (answer) => {
-      resolve(answer);
-      readline.close();
-    });
-  });
-}
+import type { ConfigType, LastCommitType } from "../index.d";
+import { MiniProgramCI } from "miniprogram-ci/dist/@types/types";
 
 /**
  * 格式化描述
@@ -63,28 +27,53 @@ function formatDescription(
   );
 }
 
-export default async function uploadAction() {
-  const config = getConfig();
-  console.log(config);
-  if (!config.version) {
-    const version = await question("\x1B[96m" + "请输入版本号：");
-    config.version = version;
-  }
-  if (!config.appid?.length) {
-    const appidStr = await question(
-      "\x1B[96m" + "请输入appid-多个小程序用','分隔："
-    );
-    const appid = appidStr
-      .split(",")
-      .map((item) => item.trim())
-      .filter((t) => t);
-    config.appid = appid;
-  }
+export default async function uploadAction(config: ConfigType) {
   const commitInfo = lastCommit();
-  const descText = formatDescription(config.description, {
+  const desc = formatDescription(config.description, {
     ...commitInfo,
     version: config.version,
   });
-  console.log(descText);
-  return;
+
+  console.log("准备上传小程序到微信");
+  console.log("生成project");
+  const { setting } = readProjectConfig(config.projectPath);
+  const { appid: appidList, version } = config;
+  appidList.forEach(async (appid) => {
+    if (!fs.existsSync(`${process.cwd()}/key/private.${appid}.key`)) {
+      console.warn("\x1B[33mWarring:" + `${appid}: key不存在，中断上传`);
+      return;
+    }
+    const project = new ci.Project({
+      appid,
+      type: "miniProgram",
+      projectPath: `${process.cwd()}/deploy/build/weapp/`,
+      privateKeyPath: `${process.cwd()}/key/private.${appid}.key`,
+      ignores: ["node_modules/**/*"],
+    });
+    console.log("生成project成功");
+    const uploadResult = await ci.upload({ project, version, desc, setting });
+    console.log(`\x1B[32m${appid} 上传完成:[${version}] ${commitInfo.info}`);
+    console.log("\x1B[37m------各分包大小------");
+    uploadResult.subPackageInfo.forEach((item) =>
+      console.log(
+        `\x1B[32m${item.name}:` +
+          `\x1B[33m${(item.size / 1024).toFixed(2)}/${2048}KB`
+      )
+    );
+  });
+  console.log("\x1B[37m---------------------");
+}
+
+function readProjectConfig(projectPath?: string): {
+  setting?: MiniProgramCI.ICompileSettings;
+} {
+  try {
+    const configStr = fs
+      .readFileSync(join(process.cwd(), `${projectPath}/project.config.json`))
+      .toString();
+    return JSON.parse(configStr) || {};
+  } catch (err) {
+    console.error("获取 config 失败!");
+    return {};
+  }
 }

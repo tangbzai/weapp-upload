@@ -1,7 +1,11 @@
-import { join } from 'path';
-import fs from 'fs';
-import ci from 'miniprogram-ci';
-import { execSync } from 'child_process';
+'use strict';
+
+var commander = require('commander');
+var readline$1 = require('readline');
+var path = require('path');
+var fs = require('fs');
+var ci = require('miniprogram-ci');
+var child_process = require('child_process');
 
 /******************************************************************************
 Copyright (c) Microsoft Corporation.
@@ -67,6 +71,30 @@ function __generator(thisArg, body) {
     }
 }
 
+var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
+
+// for now just expose the builtin process global from node.js
+var process$1 = commonjsGlobal.process;
+
+var CONFIG_PATH = "wx-upload-config.json";
+function getConfig() {
+    if (!fs.existsSync(path.join(process.cwd(), CONFIG_PATH))) {
+        console.log("".concat(CONFIG_PATH, "\u4E0D\u5B58\u5728"));
+        return {};
+    }
+    var configStr = fs.readFileSync(path.join(process.cwd(), CONFIG_PATH), {
+        encoding: "utf8"
+    });
+    try {
+        var config = JSON.parse(configStr);
+        return __assign(__assign({}, config), { appid: typeof config.appid === "string" ? [config.appid] : config.appid });
+    }
+    catch (err) {
+        console.warn("\x1B[33mWarring:" + "配置文件解析失败,请检查!");
+        return {};
+    }
+}
+
 function dateFormat(dateStr) {
     var date = new Date(dateStr);
     return "".concat(date.getFullYear(), "-").concat(date.getMonth() + 1, "-").concat(date.getDate(), " ").concat(date.getHours(), ":").concat(date.getMinutes(), ":").concat(date.getSeconds());
@@ -78,8 +106,8 @@ function matchStr(baseString, regex) {
 }
 function lastCommit() {
     try {
-        var logStr = execSync("git log -1").toString();
-        var logBranchStr = execSync("git branch -v").toString();
+        var logStr = child_process.execSync("git log -1").toString();
+        var logBranchStr = child_process.execSync("git branch -v").toString();
         return {
             commit: matchStr(logStr, new RegExp("(?<=commit).+", "g")),
             merge: matchStr(logStr, new RegExp("(?<=Merge:).+", "g")),
@@ -162,7 +190,7 @@ function uploadAction(config) {
 function readProjectConfig(projectPath) {
     try {
         var configStr = fs
-            .readFileSync(join(process.cwd(), "".concat(projectPath, "/project.config.json")))
+            .readFileSync(path.join(process.cwd(), "".concat(projectPath, "/project.config.json")))
             .toString();
         return JSON.parse(configStr) || {};
     }
@@ -172,4 +200,52 @@ function readProjectConfig(projectPath) {
     }
 }
 
-export { uploadAction };
+var readline = readline$1.createInterface({
+    input: process$1.stdin,
+    output: process$1.stdout
+});
+var upload = commander.program.command("upload");
+/**
+ * Promise 版的 question
+ */
+function question(query) {
+    return new Promise(function (resolve) {
+        readline.question(query, function (answer) {
+            resolve(answer);
+            readline.close();
+        });
+    });
+}
+upload.action(function () { return __awaiter(void 0, void 0, void 0, function () {
+    var config, version, appidStr, appid;
+    var _a;
+    return __generator(this, function (_b) {
+        switch (_b.label) {
+            case 0:
+                config = getConfig();
+                console.log(config);
+                if (!!config.version) return [3 /*break*/, 2];
+                return [4 /*yield*/, question("\x1B[96m" + "请输入版本号:")];
+            case 1:
+                version = _b.sent();
+                config.version = version;
+                _b.label = 2;
+            case 2:
+                if (!!((_a = config.appid) === null || _a === void 0 ? void 0 : _a.length)) return [3 /*break*/, 4];
+                return [4 /*yield*/, question("\x1B[96m" + "请输入appid-多个小程序用','分隔:")];
+            case 3:
+                appidStr = _b.sent();
+                appid = appidStr
+                    .split(",")
+                    .map(function (item) { return item.trim(); })
+                    .filter(function (t) { return t; });
+                config.appid = appid;
+                _b.label = 4;
+            case 4: return [4 /*yield*/, uploadAction(config)];
+            case 5:
+                _b.sent();
+                process$1.exit();
+                return [2 /*return*/];
+        }
+    });
+}); });
