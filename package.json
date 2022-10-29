@@ -2,8 +2,8 @@
   "name": "weapp-upload",
   "version": "0.0.0",
   "description": "upload WeChat miniprogram",
-  "main": "dist/weapp-upload.cjs.js",
-  "module": "dist/weapp-upload.esm.js",
+  "main": "dist/index.cjs.js",
+  "module": "dist/index.esm.js",
   "scripts": {
     "watch": "rollup -wc --configPlugin @rollup/plugin-typescript",
     "build": "rm -rf dist && rollup -c --configPlugin @rollup/plugin-typescript"
