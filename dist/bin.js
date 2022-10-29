@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-
 'use strict';
 
 var commander = require('commander');
@@ -251,3 +250,5 @@ upload.action(function () { return __awaiter(void 0, void 0, void 0, function ()
         }
     });
 }); });
+commander.program.addCommand(upload);
+commander.program.parse(process$1.argv);

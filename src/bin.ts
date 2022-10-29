@@ -43,3 +43,6 @@ upload.action(async () => {
   await uploadAction(config);
   process.exit();
 });
+
+program.addCommand(upload)
+program.parse(process.argv);
