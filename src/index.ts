@@ -1,3 +1,4 @@
+import init from "./initAction";
 import uploadAction from "./uploadAction";
 
-export { uploadAction };
+export { init, uploadAction };

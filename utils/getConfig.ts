@@ -2,7 +2,7 @@ import { join } from "path";
 import fs from "fs";
 import { ConfigType } from "../index.d";
 
-const CONFIG_PATH = "wx-upload-config.json";
+export const CONFIG_PATH = "wx-upload-config.json";
 
 export default function getConfig(): ConfigType {
   if (!fs.existsSync(join(process.cwd(), CONFIG_PATH))) {

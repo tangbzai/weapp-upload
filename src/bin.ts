@@ -1,26 +1,15 @@
 import { program } from "commander";
-import { createInterface } from "readline";
 import process from "process";
 import getConfig from "../utils/getConfig";
 import uploadAction from "./uploadAction";
+import initAction from "./initAction";
+import question from "../utils/question";
 
+const init = program.command("init");
 const upload = program.command("upload");
 
-/**
- * Promise 版的 question
- */
-function question(query: string): Promise<string> {
-  const readline = createInterface({
-    input: process.stdin,
-    output: process.stdout,
-  });
-  return new Promise((resolve) => {
-    readline.question(query, (answer) => {
-      resolve(answer);
-      readline.close();
-    });
-  });
-}
+init.action(initAction);
+program.addCommand(init);
 
 upload.action(async () => {
   const config = getConfig();
