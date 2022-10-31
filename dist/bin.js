@@ -154,7 +154,6 @@ function uploadAction(config) {
                     commitInfo = lastCommit();
                     desc = formatDescription(config.description, __assign(__assign({}, commitInfo), { version: config.version }));
                     console.log("准备上传小程序到微信");
-                    console.log("生成project");
                     setting = readProjectConfig(config.projectPath).setting;
                     appidList = config.appid, version = config.version;
                     _a.label = 1;
@@ -169,6 +168,7 @@ function uploadAction(config) {
                                             console.warn("\x1B[33mWarring:" + "".concat(appid, ": key\u4E0D\u5B58\u5728\uFF0C\u4E2D\u65AD\u4E0A\u4F20"));
                                             return [2 /*return*/];
                                         }
+                                        console.log("".concat(appid, "\u751F\u6210project"));
                                         project = new ci.Project({
                                             appid: appid,
                                             type: "miniProgram",
@@ -203,13 +203,13 @@ function uploadAction(config) {
                     resolveList = _a.sent();
                     console.log("\u4E0A\u4F20\u5B8C\u6210\uFF1A[".concat(version, "] ").concat(commitInfo.info));
                     resolveList.forEach(function (_a) {
-                        var appid = _a.appid, uploadResult = _a.uploadResult;
+                        var appid = _a.appid;
                         console.log("\u001B[32m".concat(appid, " \u4E0A\u4F20\u5B8C\u6210"));
-                        console.log("\x1B[37m------各分包大小------");
-                        uploadResult.subPackageInfo.forEach(function (item) {
-                            return console.log("\u001B[32m".concat(item.name, ":") +
-                                "\u001B[33m".concat((item.size / 1024).toFixed(2), "/").concat(2048, "KB"));
-                        });
+                    });
+                    console.log("\x1B[37m------各分包大小------");
+                    resolveList[0].uploadResult.subPackageInfo.forEach(function (item) {
+                        return console.log("\u001B[32m".concat(item.name, ":") +
+                            "\u001B[33m".concat((item.size / 1024).toFixed(2), "/").concat(2048, "KB"));
                     });
                     return [3 /*break*/, 4];
                 case 3:

@@ -36,7 +36,6 @@ export default async function uploadAction(config: ConfigType) {
   });
 
   console.log("准备上传小程序到微信");
-  console.log("生成project");
   const { setting } = readProjectConfig(config.projectPath);
   const { appid: appidList, version } = config;
   try {
@@ -50,6 +49,7 @@ export default async function uploadAction(config: ConfigType) {
           console.warn("\x1B[33mWarring:" + `${appid}: key不存在，中断上传`);
           return;
         }
+        console.log(`${appid}生成project`);
         const project = new ci.Project({
           appid,
           type: "miniProgram",
@@ -79,16 +79,16 @@ export default async function uploadAction(config: ConfigType) {
       })
     );
     console.log(`上传完成：[${version}] ${commitInfo.info}`);
-    resolveList.forEach(({ appid, uploadResult }) => {
+    resolveList.forEach(({ appid }) => {
       console.log(`\x1B[32m${appid} 上传完成`);
-      console.log("\x1B[37m------各分包大小------");
-      uploadResult.subPackageInfo.forEach((item) =>
-        console.log(
-          `\x1B[32m${item.name}:` +
-            `\x1B[33m${(item.size / 1024).toFixed(2)}/${2048}KB`
-        )
-      );
     });
+    console.log("\x1B[37m------各分包大小------");
+    resolveList[0].uploadResult.subPackageInfo.forEach((item) =>
+      console.log(
+        `\x1B[32m${item.name}:` +
+          `\x1B[33m${(item.size / 1024).toFixed(2)}/${2048}KB`
+      )
+    );
   } catch (error) {
     console.error("\x1B[31mError:" + (error as Error).message);
   }
