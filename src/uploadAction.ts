@@ -28,6 +28,20 @@ function formatDescription(
   );
 }
 
+function readProjectConfig(projectPath?: string): {
+  setting?: MiniProgramCI.ICompileSettings;
+} {
+  try {
+    const configStr = fs
+      .readFileSync(join(process.cwd(), `${projectPath}/project.config.json`))
+      .toString();
+    return JSON.parse(configStr) || {};
+  } catch (err) {
+    console.error("获取 config 失败!");
+    return {};
+  }
+}
+
 export default async function uploadAction(config: ConfigType) {
   const commitInfo = lastCommit();
   const desc = formatDescription(config.description, {
@@ -93,18 +107,4 @@ export default async function uploadAction(config: ConfigType) {
     console.error("\x1B[31mError:" + (error as Error).message);
   }
   console.log("\x1B[37m---------------------");
-}
-
-function readProjectConfig(projectPath?: string): {
-  setting?: MiniProgramCI.ICompileSettings;
-} {
-  try {
-    const configStr = fs
-      .readFileSync(join(process.cwd(), `${projectPath}/project.config.json`))
-      .toString();
-    return JSON.parse(configStr) || {};
-  } catch (err) {
-    console.error("获取 config 失败!");
-    return {};
-  }
 }
