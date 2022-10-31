@@ -11,12 +11,12 @@ export default function lastCommit(): LastCommitType {
     const logStr = execSync("git log -1").toString();
     const logBranchStr = execSync("git branch").toString();
     return {
-      commit: matchStr(logStr, new RegExp("(?<=commit).+", "g")),
-      merge: matchStr(logStr, new RegExp("(?<=Merge:).+", "g")),
-      author: matchStr(logStr, new RegExp("(?<=Author:).+", "g")),
-      date: dateFormat(matchStr(logStr, new RegExp("(?<=Date:).+", "g"))),
-      info: matchStr(logStr, new RegExp("\n\n.*", "g")),
-      branch: matchStr(logBranchStr, new RegExp("(?<=\*\s)\S+")),
+      commit: matchStr(logStr, /(?<=commit).+/g),
+      merge: matchStr(logStr, /(?<=Merge:).+/g),
+      author: matchStr(logStr, /(?<=Author:).+/g),
+      date: dateFormat(matchStr(logStr, /(?<=Date:).+/g)),
+      info: matchStr(logStr, /\n\n.*/g),
+      branch: matchStr(logBranchStr, /^(?<=\*\s)\S+/),
       buildTime: dateFormat(new Date()),
     };
   } catch (err) {

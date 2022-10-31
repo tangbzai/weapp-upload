@@ -12,6 +12,7 @@ function formatDescription(
   description?: string,
   baseData?: { version?: string } & LastCommitType
 ) {
+  if (!description) return undefined;
   const mapping = {
     "${TIME}": baseData.buildTime,
     "${VERSION}": baseData.version,
@@ -51,15 +52,19 @@ export default async function uploadAction(config: ConfigType) {
       ignores: ["node_modules/**/*"],
     });
     console.log("生成project成功");
-    const uploadResult = await ci.upload({ project, version, desc, setting });
-    console.log(`\x1B[32m${appid} 上传完成:[${version}] ${commitInfo.info}`);
-    console.log("\x1B[37m------各分包大小------");
-    uploadResult.subPackageInfo.forEach((item) =>
-      console.log(
-        `\x1B[32m${item.name}:` +
-          `\x1B[33m${(item.size / 1024).toFixed(2)}/${2048}KB`
-      )
-    );
+    try {
+      const uploadResult = await ci.upload({ project, version, desc, setting });
+      console.log(`\x1B[32m${appid} 上传完成:[${version}] ${commitInfo.info}`);
+      console.log("\x1B[37m------各分包大小------");
+      uploadResult.subPackageInfo.forEach((item) =>
+        console.log(
+          `\x1B[32m${item.name}:` +
+            `\x1B[33m${(item.size / 1024).toFixed(2)}/${2048}KB`
+        )
+      );
+    } catch (err) {
+      console.warn("\x1B[33mWarring:" + `${appid}: 上传失败！`);
+    }
   });
   console.log("\x1B[37m---------------------");
 }

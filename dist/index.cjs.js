@@ -83,12 +83,12 @@ function lastCommit() {
         var logStr = child_process.execSync("git log -1").toString();
         var logBranchStr = child_process.execSync("git branch").toString();
         return {
-            commit: matchStr(logStr, new RegExp("(?<=commit).+", "g")),
-            merge: matchStr(logStr, new RegExp("(?<=Merge:).+", "g")),
-            author: matchStr(logStr, new RegExp("(?<=Author:).+", "g")),
-            date: dateFormat(matchStr(logStr, new RegExp("(?<=Date:).+", "g"))),
-            info: matchStr(logStr, new RegExp("\n\n.*", "g")),
-            branch: matchStr(logBranchStr, new RegExp("(?<=\*\s)\S+")),
+            commit: matchStr(logStr, /(?<=commit).+/g),
+            merge: matchStr(logStr, /(?<=Merge:).+/g),
+            author: matchStr(logStr, /(?<=Author:).+/g),
+            date: dateFormat(matchStr(logStr, /(?<=Date:).+/g)),
+            info: matchStr(logStr, /\n\n.*/g),
+            branch: matchStr(logBranchStr, /^(?<=\*\s)\S+/),
             buildTime: dateFormat(new Date())
         };
     }
@@ -101,6 +101,8 @@ function lastCommit() {
  * 格式化描述
  */
 function formatDescription(description, baseData) {
+    if (!description)
+        return undefined;
     var mapping = {
         "${TIME}": baseData.buildTime,
         "${VERSION}": baseData.version,
@@ -143,8 +145,11 @@ function uploadAction(config) {
                                 ignores: ["node_modules/**/*"]
                             });
                             console.log("生成project成功");
-                            return [4 /*yield*/, ci.upload({ project: project, version: version, desc: desc, setting: setting })];
+                            _a.label = 1;
                         case 1:
+                            _a.trys.push([1, 3, , 4]);
+                            return [4 /*yield*/, ci.upload({ project: project, version: version, desc: desc, setting: setting })];
+                        case 2:
                             uploadResult = _a.sent();
                             console.log("\u001B[32m".concat(appid, " \u4E0A\u4F20\u5B8C\u6210:[").concat(version, "] ").concat(commitInfo.info));
                             console.log("\x1B[37m------各分包大小------");
@@ -152,7 +157,12 @@ function uploadAction(config) {
                                 return console.log("\u001B[32m".concat(item.name, ":") +
                                     "\u001B[33m".concat((item.size / 1024).toFixed(2), "/").concat(2048, "KB"));
                             });
-                            return [2 /*return*/];
+                            return [3 /*break*/, 4];
+                        case 3:
+                            _a.sent();
+                            console.warn("\x1B[33mWarring:" + "".concat(appid, ": \u4E0A\u4F20\u5931\u8D25\uFF01"));
+                            return [3 /*break*/, 4];
+                        case 4: return [2 /*return*/];
                     }
                 });
             }); });
