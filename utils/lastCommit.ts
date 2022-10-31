@@ -16,7 +16,7 @@ export default function lastCommit(): LastCommitType {
       author: matchStr(logStr, /(?<=Author:).+/g),
       date: dateFormat(matchStr(logStr, /(?<=Date:).+/g)),
       info: matchStr(logStr, /\n\n.*/g),
-      branch: matchStr(logBranchStr, /^(?<=\*\s)\S+/),
+      branch: matchStr(logBranchStr, /(?<=\*\s)\S+/),
       buildTime: dateFormat(new Date()),
     };
   } catch (err) {
