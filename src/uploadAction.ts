@@ -39,22 +39,48 @@ export default async function uploadAction(config: ConfigType) {
   console.log("生成project");
   const { setting } = readProjectConfig(config.projectPath);
   const { appid: appidList, version } = config;
-  appidList.forEach(async (appid) => {
-    if (!fs.existsSync(`${process.cwd()}/key/private.${appid}.key`)) {
-      console.warn("\x1B[33mWarring:" + `${appid}: key不存在，中断上传`);
-      return;
-    }
-    const project = new ci.Project({
-      appid,
-      type: "miniProgram",
-      projectPath: `${process.cwd()}/deploy/build/weapp/`,
-      privateKeyPath: `${process.cwd()}/key/private.${appid}.key`,
-      ignores: ["node_modules/**/*"],
-    });
-    console.log("生成project成功");
-    try {
-      const uploadResult = await ci.upload({ project, version, desc, setting });
-      console.log(`\x1B[32m${appid} 上传完成:[${version}] ${commitInfo.info}`);
+  try {
+    const resolveList = await Promise.all(
+      appidList.map(async (appid) => {
+        if (
+          !fs.existsSync(
+            `${join(process.cwd(), config.privateKeyPath)}/private.${appid}.key`
+          )
+        ) {
+          console.warn("\x1B[33mWarring:" + `${appid}: key不存在，中断上传`);
+          return;
+        }
+        const project = new ci.Project({
+          appid,
+          type: "miniProgram",
+          projectPath: `${join(process.cwd(), config.projectPath)}`,
+          privateKey: config.privateKey,
+          privateKeyPath:
+            config.privateKeyPath &&
+            `${join(
+              process.cwd(),
+              config.privateKeyPath
+            )}/private.${appid}.key`,
+          ignores: ["node_modules/**/*"],
+        });
+        console.log(`${appid}生成project成功`);
+        try {
+          const uploadResult = await ci.upload({
+            project,
+            version,
+            desc,
+            setting,
+          });
+          return { appid, uploadResult };
+        } catch (err) {
+          console.warn("\x1B[33mWarring:" + `${appid}: 上传失败！`);
+          throw new Error(`${appid}: 上传失败！`);
+        }
+      })
+    );
+    console.log(`上传完成：[${version}] ${commitInfo.info}`);
+    resolveList.forEach(({ appid, uploadResult }) => {
+      console.log(`\x1B[32m${appid} 上传完成`);
       console.log("\x1B[37m------各分包大小------");
       uploadResult.subPackageInfo.forEach((item) =>
         console.log(
@@ -62,10 +88,10 @@ export default async function uploadAction(config: ConfigType) {
             `\x1B[33m${(item.size / 1024).toFixed(2)}/${2048}KB`
         )
       );
-    } catch (err) {
-      console.warn("\x1B[33mWarring:" + `${appid}: 上传失败！`);
-    }
-  });
+    });
+  } catch (error) {
+    console.error("\x1B[31mError:" + (error as Error).message);
+  }
   console.log("\x1B[37m---------------------");
 }
 

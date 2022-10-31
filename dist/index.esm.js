@@ -117,55 +117,80 @@ function formatDescription(description, baseData) {
 }
 function uploadAction(config) {
     return __awaiter(this, void 0, void 0, function () {
-        var commitInfo, desc, setting, appidList, version;
+        var commitInfo, desc, setting, appidList, version, resolveList, error_1;
         var _this = this;
         return __generator(this, function (_a) {
-            commitInfo = lastCommit();
-            desc = formatDescription(config.description, __assign(__assign({}, commitInfo), { version: config.version }));
-            console.log("准备上传小程序到微信");
-            console.log("生成project");
-            setting = readProjectConfig(config.projectPath).setting;
-            appidList = config.appid, version = config.version;
-            appidList.forEach(function (appid) { return __awaiter(_this, void 0, void 0, function () {
-                var project, uploadResult;
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0:
-                            if (!fs.existsSync("".concat(process.cwd(), "/key/private.").concat(appid, ".key"))) {
-                                console.warn("\x1B[33mWarring:" + "".concat(appid, ": key\u4E0D\u5B58\u5728\uFF0C\u4E2D\u65AD\u4E0A\u4F20"));
-                                return [2 /*return*/];
-                            }
-                            project = new ci.Project({
-                                appid: appid,
-                                type: "miniProgram",
-                                projectPath: "".concat(process.cwd(), "/deploy/build/weapp/"),
-                                privateKeyPath: "".concat(process.cwd(), "/key/private.").concat(appid, ".key"),
-                                ignores: ["node_modules/**/*"]
+            switch (_a.label) {
+                case 0:
+                    commitInfo = lastCommit();
+                    desc = formatDescription(config.description, __assign(__assign({}, commitInfo), { version: config.version }));
+                    console.log("准备上传小程序到微信");
+                    console.log("生成project");
+                    setting = readProjectConfig(config.projectPath).setting;
+                    appidList = config.appid, version = config.version;
+                    _a.label = 1;
+                case 1:
+                    _a.trys.push([1, 3, , 4]);
+                    return [4 /*yield*/, Promise.all(appidList.map(function (appid) { return __awaiter(_this, void 0, void 0, function () {
+                            var project, uploadResult;
+                            return __generator(this, function (_a) {
+                                switch (_a.label) {
+                                    case 0:
+                                        if (!fs.existsSync("".concat(join(process.cwd(), config.privateKeyPath), "/private.").concat(appid, ".key"))) {
+                                            console.warn("\x1B[33mWarring:" + "".concat(appid, ": key\u4E0D\u5B58\u5728\uFF0C\u4E2D\u65AD\u4E0A\u4F20"));
+                                            return [2 /*return*/];
+                                        }
+                                        project = new ci.Project({
+                                            appid: appid,
+                                            type: "miniProgram",
+                                            projectPath: "".concat(join(process.cwd(), config.projectPath)),
+                                            privateKey: config.privateKey,
+                                            privateKeyPath: config.privateKeyPath &&
+                                                "".concat(join(process.cwd(), config.privateKeyPath), "/private.").concat(appid, ".key"),
+                                            ignores: ["node_modules/**/*"]
+                                        });
+                                        console.log("".concat(appid, "\u751F\u6210project\u6210\u529F"));
+                                        _a.label = 1;
+                                    case 1:
+                                        _a.trys.push([1, 3, , 4]);
+                                        return [4 /*yield*/, ci.upload({
+                                                project: project,
+                                                version: version,
+                                                desc: desc,
+                                                setting: setting
+                                            })];
+                                    case 2:
+                                        uploadResult = _a.sent();
+                                        return [2 /*return*/, { appid: appid, uploadResult: uploadResult }];
+                                    case 3:
+                                        _a.sent();
+                                        console.warn("\x1B[33mWarring:" + "".concat(appid, ": \u4E0A\u4F20\u5931\u8D25\uFF01"));
+                                        throw new Error("".concat(appid, ": \u4E0A\u4F20\u5931\u8D25\uFF01"));
+                                    case 4: return [2 /*return*/];
+                                }
                             });
-                            console.log("生成project成功");
-                            _a.label = 1;
-                        case 1:
-                            _a.trys.push([1, 3, , 4]);
-                            return [4 /*yield*/, ci.upload({ project: project, version: version, desc: desc, setting: setting })];
-                        case 2:
-                            uploadResult = _a.sent();
-                            console.log("\u001B[32m".concat(appid, " \u4E0A\u4F20\u5B8C\u6210:[").concat(version, "] ").concat(commitInfo.info));
-                            console.log("\x1B[37m------各分包大小------");
-                            uploadResult.subPackageInfo.forEach(function (item) {
-                                return console.log("\u001B[32m".concat(item.name, ":") +
-                                    "\u001B[33m".concat((item.size / 1024).toFixed(2), "/").concat(2048, "KB"));
-                            });
-                            return [3 /*break*/, 4];
-                        case 3:
-                            _a.sent();
-                            console.warn("\x1B[33mWarring:" + "".concat(appid, ": \u4E0A\u4F20\u5931\u8D25\uFF01"));
-                            return [3 /*break*/, 4];
-                        case 4: return [2 /*return*/];
-                    }
-                });
-            }); });
-            console.log("\x1B[37m---------------------");
-            return [2 /*return*/];
+                        }); }))];
+                case 2:
+                    resolveList = _a.sent();
+                    console.log("\u4E0A\u4F20\u5B8C\u6210\uFF1A[".concat(version, "] ").concat(commitInfo.info));
+                    resolveList.forEach(function (_a) {
+                        var appid = _a.appid, uploadResult = _a.uploadResult;
+                        console.log("\u001B[32m".concat(appid, " \u4E0A\u4F20\u5B8C\u6210"));
+                        console.log("\x1B[37m------各分包大小------");
+                        uploadResult.subPackageInfo.forEach(function (item) {
+                            return console.log("\u001B[32m".concat(item.name, ":") +
+                                "\u001B[33m".concat((item.size / 1024).toFixed(2), "/").concat(2048, "KB"));
+                        });
+                    });
+                    return [3 /*break*/, 4];
+                case 3:
+                    error_1 = _a.sent();
+                    console.error("\x1B[31mError:" + error_1.message);
+                    return [3 /*break*/, 4];
+                case 4:
+                    console.log("\x1B[37m---------------------");
+                    return [2 /*return*/];
+            }
         });
     });
 }
