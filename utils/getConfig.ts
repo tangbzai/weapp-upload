@@ -1,6 +1,7 @@
 import { join } from "path";
 import fs from "fs";
 import { ConfigType } from "../index.d";
+import log from "./log";
 
 export const CONFIG_PATH = "wx-upload-config.json";
 
@@ -19,7 +20,7 @@ export default function getConfig(): ConfigType {
       appid: typeof config.appid === "string" ? [config.appid] : config.appid,
     };
   } catch (err) {
-    console.warn("\x1B[33mWarring:" + "配置文件解析失败,请检查!");
+    log.warning("Warring:" + "配置文件解析失败,请检查!");
     return {};
   }
 }

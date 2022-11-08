@@ -2,11 +2,11 @@
 'use strict';
 
 var commander = require('commander');
-var readline = require('readline');
 var path = require('path');
 var fs = require('fs');
 var ci = require('miniprogram-ci');
 var child_process = require('child_process');
+var readline = require('readline');
 
 /******************************************************************************
 Copyright (c) Microsoft Corporation.
@@ -72,10 +72,42 @@ function __generator(thisArg, body) {
     }
 }
 
+function __spreadArray(to, from, pack) {
+    if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
+        if (ar || !(i in from)) {
+            if (!ar) ar = Array.prototype.slice.call(from, 0, i);
+            ar[i] = from[i];
+        }
+    }
+    return to.concat(ar || Array.prototype.slice.call(from));
+}
+
 var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
 
 // for now just expose the builtin process global from node.js
 var process$1 = commonjsGlobal.process;
+
+var _log_color = {
+    log: "\x1B[37m",
+    success: "\x1B[32m",
+    warning: "\x1B[33m",
+    error: "\x1B[31m",
+    aqua: "\x1B[96m"
+};
+function dye(color, msg) {
+    return _log_color[color] + "".concat(msg);
+}
+var log = Object.entries(_log_color).reduce(function (acc, _a) {
+    var _b;
+    var method = _a[0], color = _a[1];
+    return (__assign(__assign({}, acc), (_b = {}, _b[method] = function (msg) {
+        var arg = [];
+        for (var _i = 1; _i < arguments.length; _i++) {
+            arg[_i - 1] = arguments[_i];
+        }
+        console.log.apply(console, __spreadArray([color + msg], arg, false));
+    }, _b)));
+}, {});
 
 var CONFIG_PATH = "wx-upload-config.json";
 function getConfig() {
@@ -91,7 +123,7 @@ function getConfig() {
         return __assign(__assign({}, config), { appid: typeof config.appid === "string" ? [config.appid] : config.appid });
     }
     catch (err) {
-        console.warn("\x1B[33mWarring:" + "配置文件解析失败,请检查!");
+        log.warning("Warring:" + "配置文件解析失败,请检查!");
         return {};
     }
 }
@@ -144,6 +176,18 @@ function formatDescription(description, baseData) {
         return des.replace(tmp, val);
     }, description);
 }
+function readProjectConfig(projectPath) {
+    try {
+        var configStr = fs
+            .readFileSync(path.join(process.cwd(), "".concat(projectPath, "/project.config.json")))
+            .toString();
+        return JSON.parse(configStr) || {};
+    }
+    catch (err) {
+        log.warning("获取 config 失败!");
+        return {};
+    }
+}
 function uploadAction(config) {
     return __awaiter(this, void 0, void 0, function () {
         var commitInfo, desc, setting, appidList, version, resolveList, error_1;
@@ -153,7 +197,7 @@ function uploadAction(config) {
                 case 0:
                     commitInfo = lastCommit();
                     desc = formatDescription(config.description, __assign(__assign({}, commitInfo), { version: config.version }));
-                    console.log("准备上传小程序到微信");
+                    log.log("准备上传小程序到微信");
                     setting = readProjectConfig(config.projectPath).setting;
                     appidList = config.appid, version = config.version;
                     _a.label = 1;
@@ -165,10 +209,10 @@ function uploadAction(config) {
                                 switch (_a.label) {
                                     case 0:
                                         if (!fs.existsSync("".concat(path.join(process.cwd(), config.privateKeyPath), "/private.").concat(appid, ".key"))) {
-                                            console.warn("\x1B[33mWarring:" + "".concat(appid, ": key\u4E0D\u5B58\u5728\uFF0C\u4E2D\u65AD\u4E0A\u4F20"));
+                                            log.warning("Warring:" + "".concat(appid, ": key\u4E0D\u5B58\u5728\uFF0C\u4E2D\u65AD\u4E0A\u4F20"));
                                             return [2 /*return*/];
                                         }
-                                        console.log("".concat(appid, "\u751F\u6210project"));
+                                        log.log("".concat(appid, "\u751F\u6210project"));
                                         project = new ci.Project({
                                             appid: appid,
                                             type: "miniProgram",
@@ -178,7 +222,7 @@ function uploadAction(config) {
                                                 "".concat(path.join(process.cwd(), config.privateKeyPath), "/private.").concat(appid, ".key"),
                                             ignores: ["node_modules/**/*"]
                                         });
-                                        console.log("".concat(appid, "\u751F\u6210project\u6210\u529F"));
+                                        log.log("".concat(appid, "\u751F\u6210project\u6210\u529F"));
                                         _a.label = 1;
                                     case 1:
                                         _a.trys.push([1, 3, , 4]);
@@ -193,7 +237,7 @@ function uploadAction(config) {
                                         return [2 /*return*/, { appid: appid, uploadResult: uploadResult }];
                                     case 3:
                                         _a.sent();
-                                        console.warn("\x1B[33mWarring:" + "".concat(appid, ": \u4E0A\u4F20\u5931\u8D25\uFF01"));
+                                        log.warning("Warring:" + "".concat(appid, ": \u4E0A\u4F20\u5931\u8D25\uFF01"));
                                         throw new Error("".concat(appid, ": \u4E0A\u4F20\u5931\u8D25\uFF01"));
                                     case 4: return [2 /*return*/];
                                 }
@@ -201,49 +245,40 @@ function uploadAction(config) {
                         }); }))];
                 case 2:
                     resolveList = _a.sent();
-                    console.log("\u4E0A\u4F20\u5B8C\u6210\uFF1A[".concat(version, "] ").concat(commitInfo.info));
+                    log.log("\u4E0A\u4F20\u5B8C\u6210\uFF1A[".concat(version, "] ").concat(commitInfo.info));
                     resolveList.forEach(function (_a) {
                         var appid = _a.appid;
-                        console.log("\u001B[32m".concat(appid, " \u4E0A\u4F20\u5B8C\u6210"));
+                        log.success("".concat(appid, " \u4E0A\u4F20\u5B8C\u6210"));
                     });
-                    console.log("\x1B[37m------各分包大小------");
+                    log.log("------各分包大小------");
                     resolveList[0].uploadResult.subPackageInfo.forEach(function (item) {
-                        return console.log("\u001B[32m".concat(item.name, ":") +
-                            "\u001B[33m".concat((item.size / 1024).toFixed(2), "/").concat(2048, "KB"));
+                        return log.log(dye("success", "".concat(item.name, "\uFF1A")) +
+                            dye("warning", "".concat((item.size / 1024).toFixed(2), "/").concat(2048, "KB")));
                     });
                     return [3 /*break*/, 4];
                 case 3:
                     error_1 = _a.sent();
-                    console.error("\x1B[31mError:" + error_1.message);
+                    log.error("Error:" + error_1.message);
                     return [3 /*break*/, 4];
                 case 4:
-                    console.log("\x1B[37m---------------------");
+                    log.log("---------------------");
                     return [2 /*return*/];
             }
         });
     });
 }
-function readProjectConfig(projectPath) {
-    try {
-        var configStr = fs
-            .readFileSync(path.join(process.cwd(), "".concat(projectPath, "/project.config.json")))
-            .toString();
-        return JSON.parse(configStr) || {};
-    }
-    catch (err) {
-        console.error("获取 config 失败!");
-        return {};
-    }
+
+function init$1() {
+    fs.writeFileSync(path.join(process$1.cwd(), CONFIG_PATH), fs.readFileSync("./defaultConfig.json").toString());
 }
 
-var upload = commander.program.command("upload");
 /**
  * Promise 版的 question
  */
 function question(query) {
     var readline$1 = readline.createInterface({
-        input: process$1.stdin,
-        output: process$1.stdout
+        input: process.stdin,
+        output: process.stdout
     });
     return new Promise(function (resolve) {
         readline$1.question(query, function (answer) {
@@ -252,6 +287,11 @@ function question(query) {
         });
     });
 }
+
+var init = commander.program.command("init");
+var upload = commander.program.command("upload");
+init.action(init$1);
+commander.program.addCommand(init);
 upload.action(function () { return __awaiter(void 0, void 0, void 0, function () {
     var config, version, appidStr, appid;
     var _a;
@@ -260,14 +300,14 @@ upload.action(function () { return __awaiter(void 0, void 0, void 0, function ()
             case 0:
                 config = getConfig();
                 if (!!config.version) return [3 /*break*/, 2];
-                return [4 /*yield*/, question("\x1B[96m" + "请输入版本号:")];
+                return [4 /*yield*/, question(dye("aqua", "请输入版本号:"))];
             case 1:
                 version = _b.sent();
                 config.version = version;
                 _b.label = 2;
             case 2:
                 if (!!((_a = config.appid) === null || _a === void 0 ? void 0 : _a.length)) return [3 /*break*/, 4];
-                return [4 /*yield*/, question("\x1B[96m" + "请输入appid(多个小程序用','分隔):")];
+                return [4 /*yield*/, question(dye("aqua", "请输入appid(多个小程序用','分隔):"))];
             case 3:
                 appidStr = _b.sent();
                 appid = appidStr
