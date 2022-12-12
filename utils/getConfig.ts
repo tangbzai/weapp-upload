@@ -7,7 +7,7 @@ export const CONFIG_PATH = "wx-upload-config.json";
 
 export default function getConfig(): ConfigType {
   if (!fs.existsSync(join(process.cwd(), CONFIG_PATH))) {
-    console.log(`${CONFIG_PATH}不存在`);
+    log.log(`${CONFIG_PATH}不存在`);
     return {};
   }
   const configStr = fs.readFileSync(join(process.cwd(), CONFIG_PATH), {
