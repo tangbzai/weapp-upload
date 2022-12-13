@@ -13,7 +13,6 @@ function getConfigFn(str?: string): ConfigType {
     appid: objStr.match(/(?<=appid:[^\[]*\[).*(?=\])/)?.[0].split(',').map(t => t.replace(/[^\w]*/g, '')),
     description: objStr.match(/(?<=description:[^"]*").*(?=")/)?.[0],
     projectPath: objStr.match(/(?<=projectPath:[^"]*").*(?=")/)?.[0],
-    privateKey: objStr.match(/(?<=privateKey:[^"]*").*(?=")/)?.[0],
     privateKeyPath: objStr.match(/(?<=privateKeyPath:[^"]*").*(?=")/)?.[0]
   }
 }

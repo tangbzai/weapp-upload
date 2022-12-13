@@ -3,7 +3,7 @@ import fs from "fs";
 import ci from "miniprogram-ci";
 import log, { dye } from "../utils/log";
 import lastCommit from "../utils/lastCommit";
-import type { ConfigType, LastCommitType } from "../index.d";
+import type { ConfigType } from "../index.d";
 import { MiniProgramCI } from "miniprogram-ci/dist/@types/types";
 import formatDescription from "../utils/formatDescription";
 
@@ -48,7 +48,6 @@ export default async function uploadAction(config: ConfigType) {
           appid,
           type: "miniProgram",
           projectPath: `${join(process.cwd(), config.projectPath)}`,
-          privateKey: config.privateKey,
           privateKeyPath:
             config.privateKeyPath &&
             `${join(

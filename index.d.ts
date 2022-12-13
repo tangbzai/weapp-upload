@@ -4,8 +4,6 @@ export type ConfigType = {
   description?: string;
   /** project.config.json 所在的路径 */
   projectPath?: string;
-  /** 私钥内容 */
-  privateKey?: string;
   /** 私钥文件的路径 */
   privateKeyPath?: string;
 };
