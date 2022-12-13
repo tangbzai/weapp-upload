@@ -104,10 +104,14 @@ var log = Object.entries(_log_color).reduce(function (acc, _a) {
     }, _b)));
 }, {});
 
-var CONFIG_PATH = "wx-upload-config.json";
+var CONFIG_PATH = "weapp-upload.config.js";
+
+function templateConfig() {
+    return "import { defineConfig } from \"taro-weapp-upload\";\n\nexport default defineConfig({\n  version: \"0.0.0\",\n  /** \u9700\u8981\u4E0A\u4F20\u7684\u5FAE\u4FE1\u5C0F\u7A0B\u5E8F appid */\n  appid: [],\n  /** \u4E0A\u4F20\u63CF\u8FF0 */\n  description: \"\",\n  /** \u5C0F\u7A0B\u5E8F\u9879\u76EE\u6839\u76EE\u5F55 \u5373 project.config.json \u6240\u5728\u7684\u76EE\u5F55 */\n  projectPath: \"/deploy/build/weapp/\",\n  /**\n   * \u5B58\u653E\u4E0A\u4F20key\u7684\u6587\u4EF6\u5939\n   * \u91CC\u9762\u5BC6\u94A5\u6587\u4EF6\u7684\u547D\u540D\u683C\u5F0F\uFF1A".concat("private.${appid}.key", "\n   * \u5177\u4F53\u83B7\u53D6\u65B9\u5F0F\u770B\u6587\u6863\n   * @see https://developers.weixin.qq.com/miniprogram/dev/devtools/ci.html#%E5%AF%86%E9%92%A5%E5%8F%8A-IP-%E7%99%BD%E5%90%8D%E5%8D%95%E9%85%8D%E7%BD%AE\n  */\n  privateKeyPath: \"/key/\"\n})\n");
+}
 
 function init() {
-    fs.writeFileSync(join(process$1.cwd(), CONFIG_PATH), fs.readFileSync("./defaultConfig.json").toString());
+    fs.writeFileSync(join(process$1.cwd(), CONFIG_PATH), templateConfig());
 }
 
 function dateFormat(dateStr) {
@@ -158,6 +162,7 @@ function formatDescription(description, baseData) {
         return des.replace(tmp, val);
     }, description);
 }
+
 function readProjectConfig(projectPath) {
     try {
         var configStr = fs
@@ -199,7 +204,6 @@ function uploadAction(config) {
                                             appid: appid,
                                             type: "miniProgram",
                                             projectPath: "".concat(join(process.cwd(), config.projectPath)),
-                                            privateKey: config.privateKey,
                                             privateKeyPath: config.privateKeyPath &&
                                                 "".concat(join(process.cwd(), config.privateKeyPath), "/private.").concat(appid, ".key"),
                                             ignores: ["node_modules/**/*"]

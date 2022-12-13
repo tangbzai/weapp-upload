@@ -109,17 +109,30 @@ var log = Object.entries(_log_color).reduce(function (acc, _a) {
     }, _b)));
 }, {});
 
-var CONFIG_PATH = "wx-upload-config.json";
+var CONFIG_PATH = "weapp-upload.config.js";
+function getConfigFn(str) {
+    var _a, _b, _c, _d, _e, _f;
+    if (!str)
+        throw new Error("".concat(CONFIG_PATH, "\u914D\u7F6E\u6587\u4EF6\u4E0D\u5B58\u5728\uFF01"));
+    var objStr = (_a = str.match(/(?<=export default (defineConfig)?)\([^\{]*\{[^]*\n/)) === null || _a === void 0 ? void 0 : _a[0];
+    return {
+        version: (_b = objStr.match(/(?<=version:[^"]*").*(?=")/)) === null || _b === void 0 ? void 0 : _b[0],
+        appid: (_c = objStr.match(/(?<=appid:[^\[]*\[).*(?=\])/)) === null || _c === void 0 ? void 0 : _c[0].split(',').map(function (t) { return t.replace(/[^\w]*/g, ''); }),
+        description: (_d = objStr.match(/(?<=description:[^"]*").*(?=")/)) === null || _d === void 0 ? void 0 : _d[0],
+        projectPath: (_e = objStr.match(/(?<=projectPath:[^"]*").*(?=")/)) === null || _e === void 0 ? void 0 : _e[0],
+        privateKeyPath: (_f = objStr.match(/(?<=privateKeyPath:[^"]*").*(?=")/)) === null || _f === void 0 ? void 0 : _f[0]
+    };
+}
 function getConfig() {
     if (!fs.existsSync(path.join(process.cwd(), CONFIG_PATH))) {
-        console.log("".concat(CONFIG_PATH, "\u4E0D\u5B58\u5728"));
+        log.log("".concat(CONFIG_PATH, "\u4E0D\u5B58\u5728"));
         return {};
     }
     var configStr = fs.readFileSync(path.join(process.cwd(), CONFIG_PATH), {
         encoding: "utf8"
     });
     try {
-        var config = JSON.parse(configStr);
+        var config = getConfigFn(configStr);
         return __assign(__assign({}, config), { appid: typeof config.appid === "string" ? [config.appid] : config.appid });
     }
     catch (err) {
@@ -176,6 +189,7 @@ function formatDescription(description, baseData) {
         return des.replace(tmp, val);
     }, description);
 }
+
 function readProjectConfig(projectPath) {
     try {
         var configStr = fs
@@ -217,7 +231,6 @@ function uploadAction(config) {
                                             appid: appid,
                                             type: "miniProgram",
                                             projectPath: "".concat(path.join(process.cwd(), config.projectPath)),
-                                            privateKey: config.privateKey,
                                             privateKeyPath: config.privateKeyPath &&
                                                 "".concat(path.join(process.cwd(), config.privateKeyPath), "/private.").concat(appid, ".key"),
                                             ignores: ["node_modules/**/*"]
@@ -268,8 +281,12 @@ function uploadAction(config) {
     });
 }
 
+function templateConfig() {
+    return "import { defineConfig } from \"taro-weapp-upload\";\n\nexport default defineConfig({\n  version: \"0.0.0\",\n  /** \u9700\u8981\u4E0A\u4F20\u7684\u5FAE\u4FE1\u5C0F\u7A0B\u5E8F appid */\n  appid: [],\n  /** \u4E0A\u4F20\u63CF\u8FF0 */\n  description: \"\",\n  /** \u5C0F\u7A0B\u5E8F\u9879\u76EE\u6839\u76EE\u5F55 \u5373 project.config.json \u6240\u5728\u7684\u76EE\u5F55 */\n  projectPath: \"/deploy/build/weapp/\",\n  /**\n   * \u5B58\u653E\u4E0A\u4F20key\u7684\u6587\u4EF6\u5939\n   * \u91CC\u9762\u5BC6\u94A5\u6587\u4EF6\u7684\u547D\u540D\u683C\u5F0F\uFF1A".concat("private.${appid}.key", "\n   * \u5177\u4F53\u83B7\u53D6\u65B9\u5F0F\u770B\u6587\u6863\n   * @see https://developers.weixin.qq.com/miniprogram/dev/devtools/ci.html#%E5%AF%86%E9%92%A5%E5%8F%8A-IP-%E7%99%BD%E5%90%8D%E5%8D%95%E9%85%8D%E7%BD%AE\n  */\n  privateKeyPath: \"/key/\"\n})\n");
+}
+
 function init$1() {
-    fs.writeFileSync(path.join(process$1.cwd(), CONFIG_PATH), fs.readFileSync("./defaultConfig.json").toString());
+    fs.writeFileSync(path.join(process$1.cwd(), CONFIG_PATH), templateConfig());
 }
 
 /**
