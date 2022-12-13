@@ -19,3 +19,5 @@ export type LastCommitType = {
   branch?: string;
   buildTime?: string;
 };
+
+export function defineConfig(config: ConfigType): ConfigType

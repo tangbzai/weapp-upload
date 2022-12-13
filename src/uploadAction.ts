@@ -5,29 +5,8 @@ import log, { dye } from "../utils/log";
 import lastCommit from "../utils/lastCommit";
 import type { ConfigType, LastCommitType } from "../index.d";
 import { MiniProgramCI } from "miniprogram-ci/dist/@types/types";
+import formatDescription from "../utils/formatDescription";
 
-/**
- * 格式化描述
- */
-function formatDescription(
-  description?: string,
-  baseData?: { version?: string } & LastCommitType
-) {
-  if (!description) return undefined;
-  const mapping = {
-    "${TIME}": baseData.buildTime,
-    "${VERSION}": baseData.version,
-    "${AUTHOR}": baseData.author,
-    "${BRANCH}": baseData.branch,
-    "${COMMIT}": baseData.commit,
-    "${DATE}": baseData.date,
-    "${INFO}": baseData.info,
-  };
-  return Object.entries(mapping).reduce(
-    (des, [tmp, val]) => des.replace(tmp, val),
-    description
-  );
-}
 
 function readProjectConfig(projectPath?: string): {
   setting?: MiniProgramCI.ICompileSettings;

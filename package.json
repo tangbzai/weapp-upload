@@ -4,8 +4,16 @@
   "license": "MIT",
   "version": "0.0.0",
   "description": "batch upload WeChat miniprogram for Taro project",
-  "keywords": ["miniprogram", "批量上传微信小程序", "上传微信小程序"],
-  "files": ["dist/", "src/", "index.d.ts"],
+  "keywords": [
+    "miniprogram",
+    "批量上传微信小程序",
+    "上传微信小程序"
+  ],
+  "files": [
+    "dist/",
+    "src/",
+    "index.d.ts"
+  ],
   "main": "dist/index.cjs.js",
   "module": "dist/index.esm.js",
   "bin": {
@@ -29,5 +37,8 @@
   "dependencies": {
     "commander": "^9.4.1",
     "miniprogram-ci": "^1.8.35"
+  },
+  "engines": {
+    "node": "16.x"
   }
 }
