@@ -1,7 +1,0 @@
-{
-  "version": "0.0.0",
-  "appid": "appid or appid array",
-  "description": "",
-  "projectPath": "project config json",
-  "privateKeyPath": "keyPath"
-}

@@ -6,6 +6,6 @@ import { CONFIG_PATH } from "../utils/getConfig";
 export default function init() {
   fs.writeFileSync(
     join(process.cwd(), CONFIG_PATH),
-    fs.readFileSync("./defaultConfig.json").toString()
+    fs.readFileSync("./defaultConfig.js").toString()
   );
 }
