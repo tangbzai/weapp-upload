@@ -1,4 +1,4 @@
-import init from "./initAction";
-import uploadAction from "./uploadAction";
+import init from "./initAction"
+import uploadAction from "./uploadAction"
 
-export { init, uploadAction };
+export { init, uploadAction }

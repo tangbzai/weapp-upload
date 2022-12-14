@@ -1,15 +1,15 @@
-import { execSync } from "child_process";
-import type { LastCommitType } from "../..";
-import dateFormat from "./dateFormat";
+import { execSync } from "child_process"
+import type { LastCommitType } from "../.."
+import dateFormat from "./dateFormat"
 
 function matchStr(baseString: string, regex: RegExp): string {
-  return baseString.match(regex)?.[0]?.trim();
+  return baseString.match(regex)?.[0]?.trim()
 }
 
 export default function lastCommit(): LastCommitType {
   try {
-    const logStr = execSync("git log -1").toString();
-    const logBranchStr = execSync("git branch").toString();
+    const logStr = execSync("git log -1").toString()
+    const logBranchStr = execSync("git branch").toString()
     return {
       commit: matchStr(logStr, /(?<=commit).+/g),
       merge: matchStr(logStr, /(?<=Merge:).+/g),
@@ -18,8 +18,8 @@ export default function lastCommit(): LastCommitType {
       info: matchStr(logStr, /\n\n.*/g),
       branch: matchStr(logBranchStr, /(?<=\*\s)\S+/),
       buildTime: dateFormat(new Date()),
-    };
+    }
   } catch (err) {
-    throw new Error(err);
+    throw new Error(err)
   }
 }
