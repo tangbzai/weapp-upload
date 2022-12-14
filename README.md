@@ -3,12 +3,12 @@
 ### 介绍
 用于Taro项目中批量上传微信小程序的工具
 
-### 脚本调用
+### 安装
 ```
 npm install taro-weapp-upload -D
 ```
 ### 修改package.json文件
-```json
+```js
 // ...
 "script": {
   // ...
@@ -40,8 +40,6 @@ npm run init
 \${INFO}| `git log -1`的`commit`内容
 #### projectPath
 微信小程序项目的根目录，即 project.config.json 所在的路径
-
-#### privateKey
 
 #### privateKeyPath
 存放上传key的文件夹<br />
