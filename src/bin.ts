@@ -1,10 +1,10 @@
 import { program } from "commander";
 import process from "process";
-import getConfig from "../utils/getConfig";
+import getConfig from "./utils/getConfig";
 import uploadAction from "./uploadAction";
 import initAction from "./initAction";
-import question from "../utils/question";
-import { dye } from "../utils/log";
+import question from "./utils/question";
+import { dye } from "./utils/log";
 
 const init = program.command("init");
 const upload = program.command("upload");

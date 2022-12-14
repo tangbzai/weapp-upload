@@ -1,11 +1,11 @@
 import { join } from "path";
 import fs from "fs";
 import ci from "miniprogram-ci";
-import log, { dye } from "../utils/log";
-import lastCommit from "../utils/lastCommit";
+import log, { dye } from "./utils/log";
+import lastCommit from "./utils/lastCommit";
 import type { ConfigType } from "../index.d";
 import { MiniProgramCI } from "miniprogram-ci/dist/@types/types";
-import formatDescription from "../utils/formatDescription";
+import formatDescription from "./utils/formatDescription";
 
 
 function readProjectConfig(projectPath?: string): {

@@ -1,4 +1,4 @@
-import { LastCommitType } from "..";
+import { LastCommitType } from "../..";
 
 /**
  * 格式化描述

@@ -1,6 +1,6 @@
 import { join } from "path";
 import fs from "fs";
-import { ConfigType } from "../index.d";
+import { ConfigType } from "../..";
 import log from "./log";
 
 export const CONFIG_PATH = "weapp-upload.config.js";
