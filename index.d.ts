@@ -19,3 +19,12 @@ export type LastCommitType = {
 };
 
 export function defineConfig(config: ConfigType): ConfigType
+
+/** 生成配置文件 */
+export function init(): void
+
+/** 
+ * 上传行为
+ * @param config 上传配置
+ */
+export function uploadAction(config: ConfigType): Promise<void>
