@@ -4,6 +4,8 @@
   "license": "MIT",
   "version": "0.0.1",
   "description": "batch upload WeChat miniprogram for Taro project",
+  "repository": "https://github.com/tangbzai/weapp-upload.git",
+  "homepage": "https://github.com/tangbzai/weapp-upload",
   "keywords": [
     "miniprogram",
     "批量上传微信小程序",
