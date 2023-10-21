@@ -31,8 +31,10 @@ export default async function uploadAction({
   version,
 }: ConfigType) {
   const commitInfo = lastCommit()
+  if (!configProjectPath) throw new Error("需要指定小程序项目路径(projectPath)")
   // 小程序项目路径
   const projectPath = `${join(process.cwd(), configProjectPath)}`
+  if (!privateKeyPath) throw new Error("需要指定私钥文件夹路径(privateKeyPath)")
   // 存放私钥的文件夹路径
   const privateKeyFolderPath = join(process.cwd(), privateKeyPath)
   // 处理描述变量转换
