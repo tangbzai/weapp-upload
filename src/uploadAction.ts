@@ -65,6 +65,7 @@ export default async function uploadAction({
         return { appid, uploadResult }
       } catch (err) {
         log.warning("Warring:" + `${appid}: 上传失败！`)
+        log.error(err)
         throw new Error(`${appid}: 上传失败！`)
       }
     })
