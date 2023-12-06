@@ -39,7 +39,7 @@
     "typescript": "^5.2.2"
   },
   "dependencies": {
-    "commander": "^9.4.1",
+    "commander": "^11.1.0",
     "miniprogram-ci": "^1.9.8"
   },
   "engines": {
