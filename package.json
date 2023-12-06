@@ -2,7 +2,7 @@
   "name": "taro-weapp-upload",
   "author": "tangbzai",
   "license": "MIT",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "batch upload WeChat miniprogram for Taro project",
   "repository": "https://github.com/tangbzai/weapp-upload.git",
   "homepage": "https://github.com/tangbzai/weapp-upload",
