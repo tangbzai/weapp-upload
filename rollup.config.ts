@@ -1,9 +1,10 @@
+import fs from "fs"
 import { defineConfig } from "rollup"
 import type { OutputAsset, OutputChunk } from "rollup"
 import resolve from "@rollup/plugin-node-resolve"
 import typescript from "@rollup/plugin-typescript"
 import commonjs from "@rollup/plugin-commonjs"
-import fs from "fs"
+import copy from "rollup-plugin-copy"
 
 const pkg = JSON.parse(fs.readFileSync("./package.json").toString())
 const plugins = [resolve(), commonjs(), typescript()]
@@ -39,47 +40,47 @@ function deleteDirectory(dirPath) {
 }
 
 deleteDirectory("dist")
-fs.mkdirSync("./dist")
-// 拷贝命令行入口文件到产物目录
-fs.copyFileSync("./static/bin.js", "./dist/bin.js")
 export default defineConfig([
   {
     input: "./src/bin.ts",
-    output: {
-      dir: "dist",
-      format: "cjs",
-      entryFileNames: "[name].cjs",
-    },
-    plugins: [...plugins, addPrefix("#!/usr/bin/env node\n")],
+    output: [
+      {
+        dir: "dist",
+        format: "cjs",
+        entryFileNames: "[name].cjs",
+      },
+      {
+        dir: "dist",
+        format: "esm",
+        entryFileNames: "[name].mjs",
+      },
+    ],
+    plugins: [
+      ...plugins,
+      addPrefix("#!/usr/bin/env node\n"),
+      copy({
+        targets: [{ src: "./static/bin.js", dest: "./dist/" }],
+      }),
+    ],
     external,
-  },
-  {
-    input: "./src/bin.ts",
-    output: {
-      dir: "dist",
-      format: "esm",
-      entryFileNames: "[name].mjs",
+    watch: {
+      include: "./static/bin.js",
     },
-    plugins: [...plugins, addPrefix("#!/usr/bin/env node\n")],
-    external,
-  },
-  {
-    input: "./src/index.ts",
-    output: {
-      dir: "dist",
-      format: "cjs",
-      entryFileNames: "[name].cjs.js",
-    },
-    plugins,
-    external,
   },
   {
     input: "./src/index.ts",
-    output: {
-      dir: "dist",
-      format: "esm",
-      entryFileNames: "[name].esm.js",
-    },
+    output: [
+      {
+        dir: "dist",
+        format: "cjs",
+        entryFileNames: "[name].cjs.js",
+      },
+      {
+        dir: "dist",
+        format: "esm",
+        entryFileNames: "[name].esm.js",
+      },
+    ],
     plugins,
     external,
   },
