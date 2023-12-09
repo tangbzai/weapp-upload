@@ -18,7 +18,7 @@
   "main": "dist/index.cjs.js",
   "module": "dist/index.esm.js",
   "bin": {
-    "weapp-upload": "./dist/bin.js"
+    "weapp-upload": "./dist/bin.cjs"
   },
   "types": "./index.d.ts",
   "scripts": {
@@ -35,7 +35,6 @@
     "@types/node": "^18.11.5",
     "prettier": "^2.8.1",
     "rollup": "^3.2.2",
-    "rollup-plugin-copy": "^3.5.0",
     "tslib": "^2.6.2",
     "typescript": "^5.2.2"
   },

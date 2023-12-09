@@ -4,10 +4,15 @@ import type { OutputAsset, OutputChunk } from "rollup"
 import resolve from "@rollup/plugin-node-resolve"
 import typescript from "@rollup/plugin-typescript"
 import commonjs from "@rollup/plugin-commonjs"
-import copy from "rollup-plugin-copy"
 
 const pkg = JSON.parse(fs.readFileSync("./package.json").toString())
-const plugins = [resolve(), commonjs(), typescript()]
+const plugins = [
+  resolve(),
+  commonjs({
+    ignore: ["conditional-runtime-dependency"],
+  }),
+  typescript(),
+]
 
 const deps = [...Object.keys(pkg.dependencies)]
 const external = (id) => deps.includes(id)
@@ -49,23 +54,13 @@ export default defineConfig([
         format: "cjs",
         entryFileNames: "[name].cjs",
       },
-      {
-        dir: "dist",
-        format: "esm",
-        entryFileNames: "[name].mjs",
-      },
     ],
-    plugins: [
-      ...plugins,
-      addPrefix("#!/usr/bin/env node\n"),
-      copy({
-        targets: [{ src: "./static/bin.js", dest: "./dist/" }],
-      }),
-    ],
+    plugins: [...plugins, addPrefix("#!/usr/bin/env node\n")],
     external,
     watch: {
       include: "./static/bin.js",
     },
+    treeshake: true,
   },
   {
     input: "./src/index.ts",
