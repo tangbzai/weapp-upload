@@ -1,6 +1,6 @@
 import fs from "fs"
-import ci from "miniprogram-ci"
-import { MiniProgramCI } from "miniprogram-ci/dist/@types/types"
+import { Project, upload } from "miniprogram-ci"
+import type { MiniProgramCI } from "miniprogram-ci/dist/@types/types"
 import { join } from "path"
 import type { ConfigType } from "../index.d"
 import formatDescription from "./utils/formatDescription"
@@ -51,7 +51,7 @@ export default async function uploadAction({
         return
       }
       log.log(`${appid}生成project`)
-      const project = new ci.Project({
+      const project = new Project({
         appid,
         type: "miniProgram",
         projectPath,
@@ -61,7 +61,7 @@ export default async function uploadAction({
       log.log(`${appid}生成project成功`)
       // 开始上传
       try {
-        const uploadResult = await ci.upload({ project, version, desc, setting })
+        const uploadResult = await upload({ project, version, desc, setting })
         return { appid, uploadResult }
       } catch (err) {
         log.warning("Warring:" + `${appid}: 上传失败！`)
