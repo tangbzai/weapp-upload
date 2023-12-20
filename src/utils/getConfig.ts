@@ -9,14 +9,14 @@ function getConfigFn(str?: string): ConfigType {
   if (!str) throw new Error(`${CONFIG_PATH}配置文件不存在！`)
   const objStr = str.match(/(?<=export default (defineConfig)?)\([^\{]*\{[^]*\n/)?.[0]
   return {
-    version: objStr.match(/(?<=version:[^"]*").*(?=")/)?.[0],
+    version: objStr.match(/(?<=version:[^"']*["']).*(?=("|'))/)?.[0],
     appid: objStr
       .match(/(?<=appid:[^\[]*\[).*(?=\])/)?.[0]
       .split(",")
       .map((t) => t.replace(/[^\w]*/g, "")),
-    description: objStr.match(/(?<=description:[^"]*").*(?=")/)?.[0],
-    projectPath: objStr.match(/(?<=projectPath:[^"]*").*(?=")/)?.[0],
-    privateKeyPath: objStr.match(/(?<=privateKeyPath:[^"]*").*(?=")/)?.[0],
+    description: objStr.match(/(?<=description:[^"']*["']).*(?=("|'))/)?.[0],
+    projectPath: objStr.match(/(?<=projectPath:[^"']*["']).*(?=("|'))/)?.[0],
+    privateKeyPath: objStr.match(/(?<=privateKeyPath:[^"']*["']).*(?=("|'))/)?.[0],
   }
 }
 
