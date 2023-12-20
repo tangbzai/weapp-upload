@@ -57,9 +57,6 @@ export default defineConfig([
     ],
     plugins: [...plugins, addPrefix("#!/usr/bin/env node\n")],
     external,
-    watch: {
-      include: "./static/bin.js",
-    },
     treeshake: true,
   },
   {
