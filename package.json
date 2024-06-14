@@ -43,6 +43,6 @@
     "miniprogram-ci": "^1.9.10"
   },
   "engines": {
-    "node": "16.x"
+    "node": ">=16.x"
   }
 }
