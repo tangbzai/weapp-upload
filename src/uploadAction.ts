@@ -80,7 +80,10 @@ export default async function uploadAction({
   resolveList[0].uploadResult.subPackageInfo.forEach((item) =>
     log.log(
       dye("success", `${item.name}：`) +
-        dye("warning", `${(item.size / 1024).toFixed(2)}/${2048}KB`)
+        dye(
+          "warning",
+          `${(item.size / 1024).toFixed(2)}/${item.name === "__FULL__" ? 20480 : 2048}KB`
+        )
     )
   )
   log.log("---------------------")
